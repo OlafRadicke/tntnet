@@ -9,8 +9,10 @@ SUBDIRS = \
     config \
     controls \
     cookie \
+    gd \
     hello \
     mvc \
+    newsdb \
     savepoint \
     session \
     sprintf \
@@ -36,4 +38,4 @@ CLEANFILES = alldemos.cpp
 
 SUFFIXES=.ecpp .cpp
 .ecpp.cpp:
-	$(top_builddir)/sdk/tools/ecppc/ecppc -o $@ $<
+	$(AM_V_GEN)$(top_builddir)/sdk/tools/ecppc/ecppc -o $@ $<

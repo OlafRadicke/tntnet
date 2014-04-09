@@ -36,40 +36,36 @@
 
 namespace tnt
 {
+  class HttpRequest;
+  class HttpReply;
+  class QueryParams;
+  struct TntConfig;
 
-class HttpRequest;
-class HttpReply;
-class QueryParams;
-struct TntConfig;
+  class Component
+  {
+    public:
+      virtual ~Component() { }
 
-class Component
-{
-  public:
-    virtual ~Component() { }
+      virtual void configure(const tnt::TntConfig& config);
 
-    virtual void configure(const tnt::TntConfig& config);
+      virtual unsigned topCall(HttpRequest& request, HttpReply& reply, tnt::QueryParams& qparam);
+      virtual unsigned operator() (HttpRequest& request, HttpReply& reply, tnt::QueryParams& qparam);
+      virtual unsigned endTag (HttpRequest& request, HttpReply& reply, tnt::QueryParams& qparam);
 
-    virtual unsigned topCall(HttpRequest& request,
-      HttpReply& reply, tnt::QueryParams& qparam);
-    virtual unsigned operator() (HttpRequest& request,
-      HttpReply& reply, tnt::QueryParams& qparam);
-    virtual unsigned endTag (HttpRequest& request,
-      HttpReply& reply, tnt::QueryParams& qparam);
+      virtual std::string getAttribute(const std::string& name, const std::string& def = std::string()) const;
 
-    virtual std::string getAttribute(const std::string& name,
-      const std::string& def = std::string()) const;
+      /// Explicitly call operator() - sometimes more readable
+      unsigned call(HttpRequest& request, HttpReply& reply, tnt::QueryParams& qparam)
+        { return operator() (request, reply, qparam); }
 
-    /// explicitly call operator() - sometimes more readable
-    unsigned call(HttpRequest& request, HttpReply& reply, tnt::QueryParams& qparam)
-      { return operator() (request, reply, qparam); }
-    /// call component without parameters
-    unsigned call(HttpRequest& request, HttpReply& reply);
+      /// Call component without parameters
+      unsigned call(HttpRequest& request, HttpReply& reply);
 
-    /// return output as a string rather than outputting to stream
-    std::string scall(HttpRequest& request, tnt::QueryParams& qparam);
-    /// return output as a string rather than outputting to stream without query-parameters
-    std::string scall(HttpRequest& request);
-};
+      /// Get output as a string rather than outputting to stream
+      std::string scall(HttpRequest& request, tnt::QueryParams& qparam);
+      /// Get output as a string rather than outputting to stream without query-parameters
+      std::string scall(HttpRequest& request);
+  };
 
 #define TNT_VAR(scope, type, varname, key, construct)                          \
   type* varname##_pointer;                                                     \
@@ -169,7 +165,7 @@ class Component
 
 #define TNT_PARAM(type, varname, construct) \
   TNT_VAR(qparam.getScope(), type, varname, #varname, construct)
-
 }
 
 #endif // TNT_COMPONENT_H
+

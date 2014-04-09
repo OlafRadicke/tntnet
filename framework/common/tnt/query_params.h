@@ -1,11 +1,11 @@
 /*
  * Copyright (C) 2003-2005 Tommi Maekitalo
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * As a special exception, you may use this file as part of a free
  * software library without restriction. Specifically, if other files
  * instantiate templates or use macros or inline functions from this
@@ -15,12 +15,12 @@
  * License. This exception does not however invalidate any other
  * reasons why the executable file might be covered by the GNU Library
  * General Public License.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -46,7 +46,7 @@ namespace tnt
     public:
       explicit ConversionError(const std::string& msg)
         : std::runtime_error(msg)
-      { }
+        { }
 
       static void doThrow(const std::string& argname, unsigned argnum, const char* typeto, const std::string& value);
   };
@@ -115,99 +115,109 @@ namespace tnt
 
   }
 
+  /// Container for GET and POST parameters
   class QueryParams : public cxxtools::QueryParams
   {
-      Scope* paramScope;
+    private:
+      Scope* _paramScope;
       std::locale _locale;
 
     public:
+      /// Create an empty %QueryParams object
       QueryParams()
-        : paramScope(0),
+        : _paramScope(0),
           _locale(std::locale::classic())
-      { }
+        { }
 
       QueryParams(const QueryParams& src)
         : cxxtools::QueryParams(src),
-          paramScope(src.paramScope),
+          _paramScope(src._paramScope),
           _locale(src._locale)
-      { if (paramScope) paramScope->addRef(); }
+        {
+          if (_paramScope)
+            _paramScope->addRef();
+        }
 
       explicit QueryParams(const std::string& url)
         : cxxtools::QueryParams(url),
-          paramScope(0),
+          _paramScope(0),
           _locale(std::locale::classic())
-      { }
+        { }
 
       QueryParams& operator= (const QueryParams& src)
       {
         cxxtools::QueryParams::operator=(src);
-        if (paramScope != src.paramScope)
+        if (_paramScope != src._paramScope)
         {
-          if (paramScope->release() == 0)
-            delete paramScope;
-          paramScope = src.paramScope;
-          if (paramScope)
-            paramScope->addRef();
+          if (_paramScope->release() == 0)
+            delete _paramScope;
+          _paramScope = src._paramScope;
+          if (_paramScope)
+            _paramScope->addRef();
         }
         _locale = src._locale;
         return *this;
       }
+
       ~QueryParams()
       {
-        if (paramScope && paramScope->release() == 0)
-          delete paramScope;
+        if (_paramScope && _paramScope->release() == 0)
+          delete _paramScope;
       }
 
       Scope& getScope()
       {
-        if (!paramScope)
-          paramScope = new Scope();
-        return *paramScope;
+        if (!_paramScope)
+          _paramScope = new Scope();
+        return *_paramScope;
       }
 
-      const std::locale& locale() const     { return _locale; }
-      void locale(const std::locale& loc)   { _locale = loc; }
-      
+      /// Get the locale used for parsing floating-point numbers
+      const std::locale& locale() const   { return _locale; }
+
+      /// Set the locale used for parsing floating-point numbers
+      void locale(const std::locale& loc) { _locale = loc; }
+
       /**
        * Get back a single value of a argument.
        * @arg name the keyword of a argument.
        * @tparam Type set the return type.
-       * @return get back a single values. 
-       */      
+       * @return get back a single values.
+       */
       template <typename Type>
       Type arg(const std::string& name, const Type& def = Type()) const
-      { return qhelper::QArg<Type>::arg(*this, name, 0, def); }
+        { return qhelper::QArg<Type>::arg(*this, name, 0, def); }
 
       template <typename Type>
       Type argt(const std::string& name, const char* typeName = 0) const
-      { return qhelper::QArg<Type>::argt(*this, name, 0, typeName); }
+        { return qhelper::QArg<Type>::argt(*this, name, 0, typeName); }
 
       template <typename Type>
       Type argn(const std::string& name, size_type n, const Type& def = Type()) const
-      { return qhelper::QArg<Type>::arg(*this, name, n, def); }
+        { return qhelper::QArg<Type>::arg(*this, name, n, def); }
 
       template <typename Type>
       Type argnt(const std::string& name, size_type n, const char* typeName = 0) const
-      { return qhelper::QArg<Type>::argt(*this, name, n, typeName); }
+        { return qhelper::QArg<Type>::argt(*this, name, n, typeName); }
 
       template <typename Type>
       Type argt(const std::string& name, size_type n, const char* typeName = 0) const
-      { return qhelper::QArg<Type>::argt(*this, name, n, typeName); }
+        { return qhelper::QArg<Type>::argt(*this, name, n, typeName); }
 
       template <typename Type>
       Type arg(size_type n, const Type& def = Type()) const
-      { return qhelper::QArg<Type>::arg(*this, std::string(), n, def); }
+        { return qhelper::QArg<Type>::arg(*this, std::string(), n, def); }
 
       template <typename Type>
       Type argt(size_type n, const char* typeName = 0) const
-      { return qhelper::QArg<Type>::argt(*this, std::string(), n, typeName); }
+        { return qhelper::QArg<Type>::argt(*this, std::string(), n, typeName); }
 
       /**
        * Get back a list value of a argument.
        * @arg name the keyword of a argument.
        * @tparam Type set the return type.
-       * @return get back a vactor of values. 
-       */      
+       * @return get back a vactor of values.
+       */
       template <typename Type>
       typename std::vector<Type> args(const std::string& name, const Type& def = Type()) const
       {
@@ -221,7 +231,7 @@ namespace tnt
        * Get back a list value of a argument.
        * @arg name the keyword of a argument.
        * @tparam Type set the return type.
-       * @return get back a vactor of values. 
+       * @return get back a vactor of values.
        */
       template <typename Type>
       typename std::vector<Type> argst(const std::string& name, const char* typeName) const
@@ -234,10 +244,10 @@ namespace tnt
 
       template <typename Type>
       QueryParams& add(const std::string& name, const Type& value)
-      { qhelper::QAdd<Type>::add(*this, name, value); return *this; }
+        { qhelper::QAdd<Type>::add(*this, name, value); return *this; }
 
       QueryParams& add(const std::string& name, const char* value)
-      { 
+      {
         cxxtools::QueryParams::add(name, value);
         return *this;
       }
@@ -278,14 +288,10 @@ namespace tnt
     }
 
     inline std::string QArg<std::string>::arg(const QueryParams& q, const std::string& name, unsigned n, const std::string& def)
-    {
-      return q.param(name, n, def);
-    }
+      { return q.param(name, n, def); }
 
     inline std::string QArg<std::string>::argt(const QueryParams& q, const std::string& name, unsigned n, const char*)
-    {
-      return q.param(name, n);
-    }
+      { return q.param(name, n); }
 
     inline char QArg<char>::arg(const QueryParams& q, const std::string& name, unsigned n, char def)
     {
@@ -323,22 +329,15 @@ namespace tnt
     }
 
     inline void QAdd<std::string>::add(QueryParams& q, const std::string& name, const std::string& value)
-    {
-      static_cast<cxxtools::QueryParams&>(q).add(name, value);
-    }
+      { static_cast<cxxtools::QueryParams&>(q).add(name, value); }
 
     inline void QAdd<char>::add(QueryParams& q, const std::string& name, char value)
-    {
-      static_cast<cxxtools::QueryParams&>(q).add(name, std::string(1, value));
-    }
+      { static_cast<cxxtools::QueryParams&>(q).add(name, std::string(1, value)); }
 
     inline void QAdd<bool>::add(QueryParams& q, const std::string& name, bool value)
-    {
-      static_cast<cxxtools::QueryParams&>(q).add(name, value ? std::string(1, '1') : std::string());
-    }
-
+      { static_cast<cxxtools::QueryParams&>(q).add(name, value ? std::string(1, '1') : std::string()); }
   }
-
 }
 
 #endif // TNT_QUERY_PARAMS_H
+
